@@ -1,3 +1,27 @@
+on fresh fully updated ubuntu 18.04
+
+sudo apt install git
+
+git clone https://github.com/opencv/opencv_3rdparty.git
+cd opencv_3rdparty
+git submodule update --init --recursive
+git checkout ffmpeg/master
+
+https://tecadmin.net/install-docker-on-ubuntu/
+sudo apt-get purge docker lxc-docker docker-engine docker.io
+sudo apt-get install  curl  apt-transport-https ca-certificates software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add 
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install docker-ce
+sudo systemctl status docker
+
+sudo usermod -a -G docker $USER
+
+./ffmpeg/build_via_docker.sh
+
+==== ORIGINAL readme ====
+
 * On Linux and other Unix flavors OpenCV uses default or user-built ffmpeg/libav libraries.
   If user builds ffmpeg/libav from source and wants OpenCV to stay BSD library, not GPL/LGPL,
   he/she should use --enabled-shared configure flag and make sure that no GPL components are
