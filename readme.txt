@@ -2,10 +2,10 @@ on fresh fully updated ubuntu 18.04
 
 sudo apt install git
 
-git clone https://github.com/opencv/opencv_3rdparty.git
+git clone https://github.com/46cv8/opencv_3rdparty.git
 cd opencv_3rdparty
 git submodule update --init --recursive
-git checkout ffmpeg/master
+git checkout ffmpeg/master_with_nvenc
 
 https://tecadmin.net/install-docker-on-ubuntu/
 sudo apt-get purge docker lxc-docker docker-engine docker.io
