@@ -23,6 +23,7 @@ cd ../build
 update ffmpeg git://source.ffmpeg.org/ffmpeg.git n4.2.1
 update openh264 https://github.com/cisco/openh264.git v1.8.0
 update libvpx https://chromium.googlesource.com/webm/libvpx.git v1.8.1
+update nv_codec_headers https://github.com/FFmpeg/nv-codec-headers.git n9.1.23.1
 )
 
 # Pack all source code / build scripts

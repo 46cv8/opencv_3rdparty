@@ -106,6 +106,36 @@ Cflags: -I${CURRENT_DIR}/openh264_wrapper -I\${prefix} -I\${includedir}
 EOF
 )
 
+nv_codec_headers_DIR=${BUILD_DIR}/nv_codec_headers
+nv_codec_headers_x86_DIR=${BUILD_DIR}/nv_codec_headers_x86
+nv_codec_headers_x64_DIR=${BUILD_DIR}/nv_codec_headers_x64
+if [ ! -d ${nv_codec_headers_DIR} ]; then
+  echo "nv_codec_headers source tree is not found"
+  exit 1
+fi
+#[ -d ${nv_codec_headers_x86_DIR} ] ||
+(
+cd ${nv_codec_headers_DIR}
+mkdir -p ${nv_codec_headers_x86_DIR}
+rsync -a ./ ${nv_codec_headers_x86_DIR} --exclude .git
+cd ${nv_codec_headers_x86_DIR}
+CROSS=i686-w64-mingw32-
+#CROSS=i686-w64-mingw32- ./configure --target=x86-win32-gcc --prefix=${nv_codec_headers_x86_DIR}/install
+make -j ${CPU_COUNT} "PREFIX=${nv_codec_headers_x86_DIR}/install"
+make install "PREFIX=${nv_codec_headers_x86_DIR}/install"
+)
+#[ -d ${nv_codec_headers_x64_DIR} ] ||
+(
+cd ${nv_codec_headers_DIR}
+mkdir -p ${nv_codec_headers_x64_DIR}
+rsync -a ./ ${nv_codec_headers_x64_DIR} --exclude .git
+cd ${nv_codec_headers_x64_DIR}
+CROSS=x86_64-w64-mingw32-
+#CROSS=x86_64-w64-mingw32- ./configure --target=x86_64-win64-gcc --prefix=${nv_codec_headers_x64_DIR}/install
+make -j ${CPU_COUNT} "PREFIX=${nv_codec_headers_x64_DIR}/install"
+make install "PREFIX=${nv_codec_headers_x64_DIR}/install"
+)
+
 FFMPEG_DIR=${BUILD_DIR}/ffmpeg
 if [ ! -d ${FFMPEG_DIR} ]; then
   echo "FFMPEG source tree is not found"
@@ -116,14 +146,14 @@ fi
 
 FFMPEG_x86_DIR=${BUILD_DIR}/ffmpeg_x86
 FFMPEG_x86_64_DIR=${BUILD_DIR}/ffmpeg_x86_64
-FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avresample --enable-w32threads --enable-libopenh264 --enable-libvpx --disable-filters --disable-bsfs --disable-hwaccels --disable-programs --disable-debug --disable-cuda --disable-cuvid --disable-nvenc"
+FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avresample --enable-w32threads --enable-libvpx --disable-filters --disable-bsfs --enable-hwaccels --disable-programs --disable-debug --enable-cuda --enable-cuvid --enable-nvenc --enable-nonfree"
 #[ -d ${FFMPEG_x86_DIR} ] ||
 (
  cd ${FFMPEG_DIR}
  mkdir -p ${FFMPEG_x86_DIR}
  rsync -a ./ ${FFMPEG_x86_DIR} --exclude .git
  cd ${FFMPEG_x86_DIR}
- PKG_CONFIG_PATH=${openh264_x86_DIR}/lib/pkgconfig:${libvpx_x86_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86 --target-os=mingw32 --cross-prefix=i686-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
+ PKG_CONFIG_PATH=${openh264_x86_DIR}/lib/pkgconfig:${libvpx_x86_DIR}/install/lib/pkgconfig:${nv_codec_headers_x86_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86 --target-os=mingw32 --cross-prefix=i686-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
  make -j${CPU_COUNT} install
 )
 #[ -d ${FFMPEG_x86_64_DIR} ] ||
@@ -132,7 +162,7 @@ FFMPEG_CONFIGURE_OPTIONS="--pkg-config=pkg-config --enable-static --enable-avres
  mkdir -p ${FFMPEG_x86_64_DIR}
  rsync -a ./ ${FFMPEG_x86_64_DIR} --exclude .git
  cd ${FFMPEG_x86_64_DIR}
- PKG_CONFIG_PATH=${openh264_x86_64_DIR}/lib/pkgconfig:${libvpx_x64_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
+ PKG_CONFIG_PATH=${openh264_x86_64_DIR}/lib/pkgconfig:${libvpx_x64_DIR}/install/lib/pkgconfig:${nv_codec_headers_x64_DIR}/install/lib/pkgconfig ./configure --enable-cross-compile --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- ${FFMPEG_CONFIGURE_OPTIONS} --prefix=`pwd`/install
  make -j${CPU_COUNT} install
 )
 
